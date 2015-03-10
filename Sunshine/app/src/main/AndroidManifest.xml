@@ -12,6 +12,9 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        <!--  e.g. within the main activity you can hack the orientation to NOT refresh using:
+                android:configChanges = "orientation|keyboardHidden|screenSize"
+          -->
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
@@ -37,6 +40,27 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="MainActivity" />
         </activity>
+
+        <!--
+                registering the WeatherProvider (ContentProvider) in the manifest
+          -->
+
+        <provider
+            android:authorities="com.example.android.sunshine.app"
+            android:name=".data.WeatherProvider"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="com.myapp.BLAH"
+         >
+         </provider>
+
     </application>
+
+    <permission
+        android:name="come.myapp.BLAH"
+        android:protectionLevel="dangerous"
+        android:label="Licenced to BLAH"
+    >
+    </permission>
 
 </manifest>
