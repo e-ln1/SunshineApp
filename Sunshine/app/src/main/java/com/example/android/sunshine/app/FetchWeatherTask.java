@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.android.sunshine.app;
-
+//package com.example.android.sunshine.app;
+/*
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
@@ -44,23 +44,25 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
+*/
+// now that we have a SyncAdapter, this class is useless
 
 
     //in ForecastFragment this will be invoked as FetchWeatherTask(getActivity(), mForecastAdapter)
-public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
+//public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
-    private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
+    //private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
    // private ArrayAdapter<String> mForecastAdapter;
-    private final Context mContext;
+   // private final Context mContext;
 
     //public FetchWeatherTask(Context context, ArrayAdapter<String> forecastAdapter) {
-    public FetchWeatherTask(Context context) {
-        mContext = context;
+   // public FetchWeatherTask(Context context) {
+    //    mContext = context;
     //    mForecastAdapter = forecastAdapter;
-    }
-
-    private boolean DEBUG = true;
+ //   }
+//
+   // private boolean DEBUG = true;
 
     /* The date/time conversion code is going to be moved outside the asynctask later,
      * so for convenience we're breaking it out into its own method now.
@@ -112,6 +114,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
      * @param lon the longitude of the city
      * @return the row ID of the added location.
      */
+/*
     long addLocation(String locationSetting, String cityName, double lat, double lon) {
         // Students: First, check if the location with this city name exists in the db
         Cursor locationCursor = mContext.getContentResolver().query(
@@ -152,7 +155,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
         return locationId;
     }
-
+*/
     /*
         Students: This code will allow the FetchWeatherTask to continue to return the strings that
         the UX expects so that we can continue to test the application even once we begin using
@@ -181,6 +184,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
+/*
     //private String[] getWeatherDataFromJson(String forecastJsonStr,
     private void getWeatherDataFromJson(String forecastJsonStr,
                                             String locationSetting)
@@ -312,6 +316,8 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
                 inserted = mContext.getContentResolver().bulkInsert(WeatherEntry.CONTENT_URI, cvArray);
+*/
+
 /*
                 mContext.getContentResolver().bulkInsert(WeatherEntry.CONTENT_URI, cvArray);
             }
@@ -334,111 +340,111 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
                     cVVector.add(cv);
                 } while (cur.moveToNext());
 */
-            }
+//            }
 
 //            Log.d(LOG_TAG, "FetchWeatherTask Complete. " + cVVector.size() + " Inserted");
 //
 //            String[] resultStrs = convertContentValuesToUXFormat(cVVector);
 //            return resultStrs;
-            Log.d(LOG_TAG, "FetchWeatherTask Complete. " + inserted + " Inserted");
+//            Log.d(LOG_TAG, "FetchWeatherTask Complete. " + inserted + " Inserted");
 
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-            e.printStackTrace();
-        }
+//        } catch (JSONException e) {
+//            Log.e(LOG_TAG, e.getMessage(), e);
+ //           e.printStackTrace();
+//        }
 //        return null;
-    }
+//    }
 
-    @Override
+//    @Override
 //    protected String[] doInBackground(String... params) {
-    protected Void doInBackground(String... params) {
+//    protected Void doInBackground(String... params) {
 
         // If there's no zip code, there's nothing to look up.  Verify size of params.
-        if (params.length == 0) {
-            return null;
-        }
-        String locationQuery = params[0];
-
+ //       if (params.length == 0) {
+ //           return null;
+ //       }
+ //       String locationQuery = params[0];
+//
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
+ //       HttpURLConnection urlConnection = null;
+ //       BufferedReader reader = null;
 
         // Will contain the raw JSON response as a string.
-        String forecastJsonStr = null;
+ //       String forecastJsonStr = null;
 
-        String format = "json";
-        String units = "metric";
-        int numDays = 14;
+ //       String format = "json";
+ //       String units = "metric";
+  //      int numDays = 14;
 
-        try {
+  //      try {
             // Construct the URL for the OpenWeatherMap query
             // Possible parameters are avaiable at OWM's forecast API page, at
             // http://openweathermap.org/API#forecast
-            final String FORECAST_BASE_URL =
-                    "http://api.openweathermap.org/data/2.5/forecast/daily?";
-            final String QUERY_PARAM = "q";
-            final String FORMAT_PARAM = "mode";
-            final String UNITS_PARAM = "units";
-            final String DAYS_PARAM = "cnt";
+ //           final String FORECAST_BASE_URL =
+ //                   "http://api.openweathermap.org/data/2.5/forecast/daily?";
+ //           final String QUERY_PARAM = "q";
+ //           final String FORMAT_PARAM = "mode";
+ //           final String UNITS_PARAM = "units";
+ //           final String DAYS_PARAM = "cnt";
 
-            Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
-                    .appendQueryParameter(QUERY_PARAM, params[0])
-                    .appendQueryParameter(FORMAT_PARAM, format)
-                    .appendQueryParameter(UNITS_PARAM, units)
-                    .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
-                    .build();
-
-            URL url = new URL(builtUri.toString());
+  //          Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
+  //                  .appendQueryParameter(QUERY_PARAM, params[0])
+   //                 .appendQueryParameter(FORMAT_PARAM, format)
+   //                 .appendQueryParameter(UNITS_PARAM, units)
+  //                  .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
+ //                   .build();
+//
+  //          URL url = new URL(builtUri.toString());
 
             // Create the request to OpenWeatherMap, and open the connection
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
+  //          urlConnection = (HttpURLConnection) url.openConnection();
+//            urlConnection.setRequestMethod("GET");
+  //          urlConnection.connect();
 
             // Read the input stream into a String
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if (inputStream == null) {
+  //          InputStream inputStream = urlConnection.getInputStream();
+  //          StringBuffer buffer = new StringBuffer();
+  //          if (inputStream == null) {
                 // Nothing to do.
-                return null;
-            }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
+  //              return null;
+  //          }
+ //           reader = new BufferedReader(new InputStreamReader(inputStream));
 
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+  //          String line;
+    //        while ((line = reader.readLine()) != null) {
+   //             // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
                 // But it does make debugging a *lot* easier if you print out the completed
                 // buffer for debugging.
-                buffer.append(line + "\n");
-            }
+   //             buffer.append(line + "\n");
+  //          }
 
-            if (buffer.length() == 0) {
+   //         if (buffer.length() == 0) {
                 // Stream was empty.  No point in parsing.
-                return null;
-            }
-            forecastJsonStr = buffer.toString();
-            getWeatherDataFromJson(forecastJsonStr, locationQuery);
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Error ", e);
+  //              return null;
+ //           }
+ //           forecastJsonStr = buffer.toString();
+//            getWeatherDataFromJson(forecastJsonStr, locationQuery);
+ //       } catch (IOException e) {
+//            Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the weather data, there's no point in attempting
             // to parse it.
             //return null;
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-            e.printStackTrace();
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (final IOException e) {
-                    Log.e(LOG_TAG, "Error closing stream", e);
-                }
-            }
-        }
+ //       } catch (JSONException e) {
+ //           Log.e(LOG_TAG, e.getMessage(), e);
+ //           e.printStackTrace();
+ //       } finally {
+ //           if (urlConnection != null) {
+ //               urlConnection.disconnect();
+ //           }
+  //          if (reader != null) {
+   //             try {
+    //                reader.close();
+    //            } catch (final IOException e) {
+   //                 Log.e(LOG_TAG, "Error closing stream", e);
+   //             }
+  //          }
+  //      }
 
 //        try {
 //            return getWeatherDataFromJson(forecastJsonStr, locationQuery);
@@ -447,8 +453,8 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 //            e.printStackTrace();
 //        }
 //        // This will only happen if there was an error getting or parsing the forecast.
-        return null;
-    }
+//        return null;
+//    }
 
 //    @Override
 //    protected void onPostExecute(String[] result) {
@@ -461,4 +467,4 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 //        }
 //    }
 
-}
+// }

@@ -15,6 +15,9 @@
  */
 package com.example.android.sunshine.app;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -29,16 +32,32 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import com.example.android.sunshine.app.data.WeatherContract;
+//import com.example.android.sunshine.app.service.SunshineService;
+import com.example.android.sunshine.app.sync.SunshineSyncAdapter;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.content.CursorLoader;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
  * Encapsulates fetching the forecast and displaying it as a {@link ListView} layout.
  */
 public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private ForecastAdapter mForecastAdapter;
+
+    private ListView mListView;
+    private int mPosition = ListView.INVALID_POSITION;
+
+    private boolean mUseTodayLayout;
+
+    private static final String SELECTED_KEY = "selected_position";
 
 //    private ArrayAdapter<String> mForecastAdapter;
     private static final int FORECAST_LOADER = 0;
@@ -74,9 +93,15 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     static final int COL_COORD_LAT = 7;
     static final int COL_COORD_LONG = 8;
 
-    private ForecastAdapter mForecastAdapter;
 
     public ForecastFragment() {
+    }
+
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        public void onItemSelected(Uri dateUri);
     }
 
     @Override
@@ -136,41 +161,69 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         // Get a reference to the ListView, and attach this adapter to it.
-        ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
-        listView.setAdapter(mForecastAdapter);
+        //ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
+        //listView.setAdapter(mForecastAdapter);
+                // now using mListView
+        mListView = (ListView) rootView.findViewById(R.id.listview_forecast);
+        mListView.setAdapter(mForecastAdapter);
 
         // We'll call our MainActivity
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        //listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 // CursorAdapter returns a cursor at the correct position for getItem(), or null
                 // if it cannot seek to that position.
+                // Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+
+                // now using multi-pane views requires us to use "Callbacks" in onItemClick
+
+                //Cursor cursor = mForecastAdapter.getCursor();
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
                 if (cursor != null) {
+                    //if (cursor != null && cursor.moveToPosition(position)) {
                     String locationSetting = Utility.getPreferredLocation(getActivity());
-                    Intent intent = new Intent(getActivity(), DetailActivity.class)
-                            .setData(WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
+                    //  Intent intent = new Intent(getActivity(), DetailActivity.class)
+                    //          .setData(WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
+                    //                  locationSetting, cursor.getLong(COL_WEATHER_DATE)))
+                    //        .putExtra(DetailActivity.DATE_KEY, cursor.getLong(COL_WEATHER_DATE))
+                    // I don't get how this "DATE_KEY" thing is supposed to make things work
+                    //          ;
+                    //  startActivity(intent);
+
+                    // now that we are using the "Callback" we don't want to explicitly create a
+                    // new activity because we may possibly have two panes in one activity
+                    ((Callback) getActivity())
+                            .onItemSelected(WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
                                     locationSetting, cursor.getLong(COL_WEATHER_DATE)
                             ));
-                    startActivity(intent);
                 }
+                // save the position for orientation refresh
+                mPosition = position;
             }
         });
 
-/*
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+            // The listview probably hasn't even been populated yet.  Actually perform the
+            // swapout in onLoadFinished.
+            mPosition = savedInstanceState.getInt(SELECTED_KEY);
+        }
+
+        return rootView;
+
         // Create some dummy data for the ListView.  Here's a sample weekly forecast
-        String[] data = {
-                "Mon 6/23 - Sunny - 31/17",
-                "Tue 6/24 - Foggy - 21/8",
-                "Wed 6/25 - Cloudy - 22/17",
-                "Thurs 6/26 - Rainy - 18/11",
-                "Fri 6/27 - Foggy - 21/10",
-                "Sat 6/28 - TRAPPED IN WEATHERSTATION - 23/18",
-                "Sun 6/29 - Sunny - 20/7"
-        };
-        List<String> weekForecast = new ArrayList<String>(Arrays.asList(data));
-*/
+        //String[] data = {
+        //        "Mon 6/23 - Sunny - 31/17",
+        //        "Tue 6/24 - Foggy - 21/8",
+        //        "Wed 6/25 - Cloudy - 22/17",
+        //        "Thurs 6/26 - Rainy - 18/11",
+        //        "Fri 6/27 - Foggy - 21/10",
+        //        "Sat 6/28 - TRAPPED IN WEATHERSTATION - 23/18",
+        //        "Sun 6/29 - Sunny - 20/7"
+        //};
+//      List<String> weekForecast = new ArrayList<String>(Arrays.asList(data));
+
         // Now that we have some dummy forecast data, create an ArrayAdapter.
         // The ArrayAdapter will take data from a source (like our dummy forecast) and
         // use it to populate the ListView it's attached to.
@@ -197,8 +250,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 startActivity(intent);
             }
         });
-*/
         return rootView;
+*/
     }
 
     @Override
@@ -219,10 +272,42 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 //        String location = prefs.getString(getString(R.string.pref_location_key),
 //                getString(R.string.pref_location_default));
 
-        FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity());
-        String location = Utility.getPreferredLocation(getActivity());
+//        FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity());
+//        String location = Utility.getPreferredLocation(getActivity());
+//        weatherTask.execute(location);
 
-        weatherTask.execute(location);
+        // To use an IntentService, we no longer want to use FetchWeatherTask here
+
+        //FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity());
+        //String location = Utility.getPreferredLocation(getActivity());
+        //weatherTask.execute(location);
+
+        // an IntentService we have created, called SunshineService
+//        Intent intent = new Intent(getActivity(), SunshineService.class);
+//        intent.putExtra(SunshineService.LOCATION_QUERY_EXTRA,
+//                Utility.getPreferredLocation(getActivity()));
+//        getActivity().startService(intent);
+
+        // and NOW... we are using a PendingIntent for the broadcast receiver AlarmManager
+/*
+        Intent alarmIntent = new Intent(getActivity(), SunshineService.AlarmReceiver.class);
+        alarmIntent.putExtra(SunshineService.LOCATION_QUERY_EXTRA, Utility.getPreferredLocation(getActivity()));
+
+        //Wrap in a pending intent which only fires once.
+        PendingIntent pi = PendingIntent.getBroadcast(
+                getActivity(), 0,alarmIntent,PendingIntent.FLAG_ONE_SHOT);
+                //getBroadcast(context, 0, i, 0);
+
+        AlarmManager am=(AlarmManager)getActivity().getSystemService(Context.ALARM_SERVICE);
+
+        //Set the AlarmManager to wake up the system.
+        // absurdly short, 5 seconds, to test
+        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 5000, pi);
+*/
+        // and now... we are using a Sync Adapter ... very simple in the call here
+        // but the package... omg the package
+        SunshineSyncAdapter.syncImmediately(getActivity());
+
     }
 /*
     @Override               // this update behavior in onStart is a battery drain
@@ -252,6 +337,13 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         mForecastAdapter.swapCursor(cursor);
+
+        if (mPosition != ListView.INVALID_POSITION) {
+            // If we don't need to restart the loader, and there's a desired position to restore
+            // to, do so now.
+            mListView.smoothScrollToPosition(mPosition);
+        }
+
     }
 
     @Override
@@ -259,7 +351,12 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         mForecastAdapter.swapCursor(null);
     }
 
-
+    public void setUseTodayLayout(boolean useTodayLayout) {
+        mUseTodayLayout = useTodayLayout;
+        if (mForecastAdapter != null) {
+            mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
+        }
+    }
 
 
 //    public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
